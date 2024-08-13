@@ -18,9 +18,7 @@ C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\re
 C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\Slicer14 v2.pdb
 C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\Slicer14 v2.genruntimeconfig.cache
 C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\ref\Slicer14 v2.dll
-C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\UserControl.g.cs
 C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\GeneratedInternalTypeHelper.g.cs
-C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\UserControl.baml
 C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\bin\Debug\net8.0-windows\Cyotek.Drawing.BitmapFont.dll
 C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\bin\Debug\net8.0-windows\HelixToolkit.dll
 C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\bin\Debug\net8.0-windows\HelixToolkit.Wpf.SharpDX.dll
@@ -40,3 +38,9 @@ C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\bin\Debug\net8.0-windows\ru
 C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\bin\Debug\net8.0-windows\runtimes\osx-x64\native\libassimp.dylib
 C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\bin\Debug\net8.0-windows\runtimes\win-x64\native\assimp.dll
 C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\bin\Debug\net8.0-windows\runtimes\win-x86\native\assimp.dll
+C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\TopBarControl.baml
+C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\SideBar.g.cs
+C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\TopBarControl.g.cs
+C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\SideBar.baml
+C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\ViewportControl.g.cs
+C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\ViewportControl.baml

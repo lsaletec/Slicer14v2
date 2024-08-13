@@ -8,7 +8,7 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <StackPanel Background="DarkGray">
         <TextBlock Text="Side Panel" FontWeight="Bold" Margin="10"/>
-        <Button Content="Import Model" Margin="10" Command="{Binding LoadModelCommand}"/>
+        <Button Content="Import Model" Margin="10"/>
         <Button Content="Button 2" Margin="10"/>
         <Button Content="Button 3" Margin="10"/>
     </StackPanel>

@@ -43,6 +43,22 @@ public class MainViewModel : INotifyPropertyChanged
         OnPropertyChanged(propertyName);
         return true;
     }
+    
+    // Method to handle MouseLeftButtonDown event
+    public void OnMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        var viewport = sender as Viewport3DX;
+        if (viewport != null)
+        {
+            var hitResult = viewport.FindHits(e.GetPosition(viewport));
+            if (hitResult != null)
+            {
+                var hitModel = hitResult[0].ModelHit;
+                // Perform action with hitModel
+            }
+        }
+    }
+    
     private void LoadModel()
     {
         // Implement the logic to open a file dialog and load a model

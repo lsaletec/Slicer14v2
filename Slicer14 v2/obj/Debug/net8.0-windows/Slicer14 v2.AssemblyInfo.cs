@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Slicer14 v2")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5655d2f2fe7da921503d7fc176c7659b8f893bc9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d46dc5d6c76aba29c7b0197dfab320ac4621cef3")]
 [assembly: System.Reflection.AssemblyProductAttribute("Slicer14 v2")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Slicer14 v2")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

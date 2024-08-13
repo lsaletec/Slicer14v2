@@ -20,9 +20,10 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        this.DataContext = new MainViewModel(); // Set the DataContext
     }
     
-    private void GridSplitter_DragStarted(object sender, DragStartedEventArgs e)
+    /*private void GridSplitter_DragStarted(object sender, DragStartedEventArgs e)
     {
         // Pause rendering
         view1.Visibility = Visibility.Collapsed;
@@ -32,5 +33,5 @@ public partial class MainWindow : Window
     {
         // Resume rendering
         view1.Visibility = Visibility.Visible;
-    }
+    }*/
 }
