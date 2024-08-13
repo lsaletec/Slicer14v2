@@ -1,0 +1,52 @@
+﻿<Window x:Class="Slicer14_v2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Slicer14_v2"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <!-- Define a 3-column grid: side panel, splitter, and main content area -->
+        <Grid.ColumnDefinitions>
+            <!-- Side panel column: Set an initial width and allow resizing -->
+            <ColumnDefinition Width="200"/>
+            <!-- GridSplitter column: This will allow the user to resize the side panel -->
+            <ColumnDefinition Width="5"/>
+            <!-- Main content area: Takes up the rest of the space -->
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Side panel -->
+        <local:UserControl Grid.Column="0"/>
+
+        <!-- GridSplitter -->
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                      Background="Gray" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns"/>
+
+        <!-- Main content area -->
+        <!-- Main content area with 3D viewport -->
+        <Viewport3D Grid.Column="2">
+            <Viewport3D.Camera>
+                <PerspectiveCamera Position="3, 3, 3" LookDirection="-3,-3,-3" UpDirection="0,1,0" FieldOfView="45" />
+            </Viewport3D.Camera>
+            <ModelVisual3D>
+                <ModelVisual3D.Content>
+                    <Model3DGroup>
+                        <!-- Example 3D model: A simple cube -->
+                        <DirectionalLight Color="White" Direction="-1,-1,-1" />
+                        <GeometryModel3D>
+                            <GeometryModel3D.Geometry>
+                                <MeshGeometry3D Positions="-1,-1,-1 1,-1,-1 1,1,-1 -1,1,-1 -1,-1,1 1,-1,1 1,1,1 -1,1,1"
+                                                TriangleIndices="0 1 2 0 2 3 1 5 6 1 6 2 5 4 7 5 7 6 4 0 3 4 3 7 3 2 6 3 6 7 0 1 5 0 5 4"/>
+                            </GeometryModel3D.Geometry>
+                            <GeometryModel3D.Material>
+                                <DiffuseMaterial Brush="LightGreen" />
+                            </GeometryModel3D.Material>
+                        </GeometryModel3D>
+                    </Model3DGroup>
+                </ModelVisual3D.Content>
+            </ModelVisual3D>
+        </Viewport3D>
+    </Grid>
+</Window>
