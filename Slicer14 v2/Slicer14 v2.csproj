@@ -9,4 +9,9 @@
         <UseWPF>true</UseWPF>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
+      <PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="2.25.0" />
+    </ItemGroup>
+
 </Project>
