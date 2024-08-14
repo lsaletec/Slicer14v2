@@ -5,6 +5,9 @@
              xmlns:local="clr-namespace:Slicer14_v2"
              x:Name="ViewportControlRoot"
              DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    <UserControl.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </UserControl.Resources>
     <Grid>
         <hx:Viewport3DX x:Name="viewport"
                         Camera="{Binding Camera}"
@@ -15,12 +18,16 @@
             <hx:ItemsModel3D ItemsSource="{Binding Models}">
                 <hx:ItemsModel3D.ItemTemplate>
                     <DataTemplate>
-                        <hx:MeshGeometryModel3D Geometry="{Binding Geometry}" Material="{Binding Material}" Transform="{Binding Transform, Mode=TwoWay}" />
+                        <hx:MeshGeometryModel3D Geometry="{Binding Geometry}" Material="{Binding Material}" Transform="{Binding Transform, Mode=TwoWay}" Tag="{Binding Tag}" />
                     </DataTemplate>
                 </hx:ItemsModel3D.ItemTemplate>
             </hx:ItemsModel3D>
             <!-- Manipulator for transformations -->
-            <hx:TransformManipulator3D x:Name="manipulator" Target="{Binding SelectedModel}" />
+            <hx:TransformManipulator3D x:Name="manipulator"
+                                       Target="{Binding SelectedModel}" 
+                                       Transform="{Binding ManipulatorPosition}"
+                                       Visibility="{Binding IsManipulatorVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+
 
         </hx:Viewport3DX>
         <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Vertical">
@@ -31,4 +38,5 @@
             <Button Command="{Binding ResetTransformsCommand}">Reset Transforms</Button>
         </StackPanel>
     </Grid>
+    
 </UserControl>
