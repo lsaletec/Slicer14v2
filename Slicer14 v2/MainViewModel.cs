@@ -178,7 +178,7 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public void Load3DModel(string filePath)
+       public void Load3DModel(string filePath)
 {
     var importer = new AssimpContext();
     var scene = importer.ImportFile(filePath, PostProcessSteps.Triangulate | PostProcessSteps.GenerateNormals | PostProcessSteps.FlipUVs);
@@ -190,7 +190,6 @@ public class MainViewModel : INotifyPropertyChanged
 
     var fileName = System.IO.Path.GetFileNameWithoutExtension(filePath);
     
-    Models.Clear();
 
     foreach (var mesh in scene.Meshes)
     {
@@ -229,7 +228,7 @@ public class MainViewModel : INotifyPropertyChanged
         {
             DiffuseColor = Color.White.ToColor4()
         };
-
+        fileName = GenerateUniqueName(fileName);
         var model = new MeshGeometryModel3D
         {
             Geometry = helixMesh,
@@ -242,6 +241,20 @@ public class MainViewModel : INotifyPropertyChanged
         Console.WriteLine(model.Tag);
         Models.Add(model);
     }
+}
+
+// Helper method to generate a unique name
+private string GenerateUniqueName(string baseName)
+{
+    string uniqueName = baseName;
+    int counter = 1;
+
+    while (Models.Any(m => m.Tag?.ToString() == uniqueName))
+    {
+        uniqueName = $"{baseName}{counter++}";
+    }
+
+    return uniqueName;
 }
 
 private Vector3 CalculateModelCenter(List<Vector3> positions)

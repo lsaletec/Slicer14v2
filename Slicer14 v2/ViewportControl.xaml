@@ -24,6 +24,7 @@
             </hx:ItemsModel3D>
             <!-- Manipulator for transformations -->
             <hx:TransformManipulator3D x:Name="manipulator"
+                                       Tag="manipulator"
                                        Target="{Binding SelectedModel}" 
                                        Transform="{Binding ManipulatorPosition}"
                                        Visibility="{Binding IsManipulatorVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
