@@ -17,6 +17,26 @@ public class MainViewModel : INotifyPropertyChanged
     public Camera Camera { get; }
     public ObservableCollection<Element3D> Models { get; } = new ObservableCollection<Element3D>();
     public ICommand LoadModelCommand { get; }
+    public ICommand ResetTransformsCommand { get; }
+
+    private Element3D _selectedModel;
+    public Element3D SelectedModel
+    {
+        get => _selectedModel;
+        set
+        {
+            if (_selectedModel != value)
+            {
+                _selectedModel = value;
+                if (_selectedModel is MeshGeometryModel3D meshModel && meshModel.Transform == null)
+                {
+                    meshModel.Transform = new TranslateTransform3D(0, 0, 0);
+                }
+                OnPropertyChanged(nameof(SelectedModel));
+            }
+        }
+    }
+
     public MainViewModel()
     {
         EffectsManager = new DefaultEffectsManager();
@@ -27,6 +47,7 @@ public class MainViewModel : INotifyPropertyChanged
             UpDirection = new Vector3D(0, 1, 0)
         };
         LoadModelCommand = new RelayCommand(LoadModel);
+        ResetTransformsCommand = new RelayCommand(ResetTransforms);
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -50,21 +71,48 @@ public class MainViewModel : INotifyPropertyChanged
         var viewport = sender as Viewport3DX;
         if (viewport != null)
         {
-            var hitResult = viewport.FindHits(e.GetPosition(viewport));
-            if (hitResult != null)
+            var hits = viewport.FindHits(e.GetPosition(viewport));
+            if (hits.Count > 0)
             {
-                var hitModel = hitResult[0].ModelHit;
-                // Perform action with hitModel
+                Console.WriteLine($"Models size: {Models.Count}");
+                foreach (var hit in hits)
+                {
+                    // Check if the hit object is a model you want to select, and not the manipulator
+                    
+                    if (hit.ModelHit is MeshGeometryModel3D m )
+                    {
+                        Console.WriteLine($"Tag: {m.Tag}");
+                        Console.WriteLine($"GUID: {m.GUID}");
+                        MeshGeometryModel3D m2 = (MeshGeometryModel3D)hit.ModelHit;
+                        Console.WriteLine($"hitTag: {m2.Tag}");
+                        Console.WriteLine("Is meshgeometry");
+                    }
+                    if (Models.Contains(hit.ModelHit))
+                    {
+                        Console.WriteLine("Contains");
+                    }
+                }
+                SelectedModel = hits[0].ModelHit as Element3D;
             }
         }
     }
-    
+
+    private void ResetTransforms()
+    {
+        foreach (var model in Models)
+        {
+            if (model is MeshGeometryModel3D meshModel)
+            {
+                meshModel.Transform = new TranslateTransform3D(0, 0, 0);
+            }
+        }
+    }
+
     private void LoadModel()
     {
-        // Implement the logic to open a file dialog and load a model
         var openFileDialog = new Microsoft.Win32.OpenFileDialog
         {
-            Filter = "3D Models|*.obj;*.fbx;*.dae|All Files|*.*"
+            Filter = "3D Models|*.obj;*.fbx;*.dae,*.stl|All Files|*.*"
         };
 
         if (openFileDialog.ShowDialog() == true)
@@ -72,7 +120,7 @@ public class MainViewModel : INotifyPropertyChanged
             Load3DModel(openFileDialog.FileName);
         }
     }
-    
+
     public void Load3DModel(string filePath)
     {
         var importer = new AssimpContext();
@@ -83,10 +131,10 @@ public class MainViewModel : INotifyPropertyChanged
             throw new System.Exception("Failed to load model.");
         }
 
-        // Clear any previous models
+        var fileName = System.IO.Path.GetFileNameWithoutExtension(filePath);
+        
         Models.Clear();
 
-        // Convert Assimp meshes to HelixToolkit meshes
         foreach (var mesh in scene.Meshes)
         {
             var positions = new List<Vector3>();
@@ -116,14 +164,17 @@ public class MainViewModel : INotifyPropertyChanged
                 DiffuseColor = Color.White.ToColor4()
             };
 
+            
             var model = new MeshGeometryModel3D
             {
                 Geometry = helixMesh,
-                Material = material
+                Material = material,
+                Transform = new TranslateTransform3D(0, 0, 0),
+                Name = fileName, // Assign the file name as the model name,
+                Tag = fileName // Use the Tag to store the identifier
             };
-
+            Console.WriteLine(model.Tag);
             Models.Add(model);
         }
     }
-    
 }

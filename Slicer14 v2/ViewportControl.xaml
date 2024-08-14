@@ -6,20 +6,29 @@
              x:Name="ViewportControlRoot"
              DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Grid>
-        <hx:Viewport3DX Grid.Column="2" x:Name="view1"
+        <hx:Viewport3DX x:Name="viewport"
                         Camera="{Binding Camera}"
                         EffectsManager="{Binding EffectsManager}"
+                        EnableD2DRendering="False"
                         MouseLeftButtonDown="Viewport_MouseLeftButtonDown">
             <hx:DirectionalLight3D Color="White" Direction="-1,-1,-1"/>
-
-            <!-- Use ItemsModel3D to bind the Models collection -->
             <hx:ItemsModel3D ItemsSource="{Binding Models}">
                 <hx:ItemsModel3D.ItemTemplate>
                     <DataTemplate>
-                        <hx:MeshGeometryModel3D Geometry="{Binding Geometry}" Material="{Binding Material}" />
+                        <hx:MeshGeometryModel3D Geometry="{Binding Geometry}" Material="{Binding Material}" Transform="{Binding Transform, Mode=TwoWay}" />
                     </DataTemplate>
                 </hx:ItemsModel3D.ItemTemplate>
             </hx:ItemsModel3D>
+            <!-- Manipulator for transformations -->
+            <hx:TransformManipulator3D x:Name="manipulator" Target="{Binding SelectedModel}" />
+
         </hx:Viewport3DX>
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Vertical">
+            <CheckBox IsChecked="{Binding ElementName=manipulator, Path=EnableScaling}">Enable Scaling</CheckBox>
+            <CheckBox IsChecked="{Binding ElementName=manipulator, Path=EnableRotation}">Enable Rotation</CheckBox>
+            <CheckBox IsChecked="{Binding ElementName=manipulator, Path=EnableTranslation}">Enable Translation</CheckBox>
+            <Button Command="{Binding LoadModelCommand}">Load Model</Button>
+            <Button Command="{Binding ResetTransformsCommand}">Reset Transforms</Button>
+        </StackPanel>
     </Grid>
 </UserControl>
