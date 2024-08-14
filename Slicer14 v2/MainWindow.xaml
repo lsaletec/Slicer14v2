@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:Slicer14_v2"
         xmlns:sharpDx="clr-namespace:SharpDX;assembly=SharpDX.Mathematics"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="800" Width="1080">
     <Window.DataContext>
         <local:MainViewModel/>
     </Window.DataContext>
@@ -44,7 +44,7 @@
                           Background="Gray" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns"/>
 
             <!-- Right Side panel -->
-            <local:RightSidePanelControl Grid.Column="4"/>
+            <local:RightSidePanelControl Grid.Column="4" DataContext="{Binding}"/>
         </Grid>
     </DockPanel>
 </Window>

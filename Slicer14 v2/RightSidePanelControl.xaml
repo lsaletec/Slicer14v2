@@ -9,7 +9,8 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid Background="DarkGray">
         <!-- TreeView to display the model hierarchy -->
-        <TreeView Background="DarkGray" ItemsSource="{Binding Models}"
+        <TreeView Background="DarkGray" x:Name="treeView"
+                  ItemsSource="{Binding Models}"
                   SelectedItemChanged="TreeView_SelectedItemChanged">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate DataType="{x:Type hx:Element3D}">

@@ -35,11 +35,11 @@ public class MainViewModel : INotifyPropertyChanged
             }
         }
     }
-    protected void OnPropertyChanged(string propertyName)
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
+        Console.WriteLine($"OnPropertyChanged called for {propertyName}");
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-
     
     private bool _isManipulatorVisible;
     public bool IsManipulatorVisible
@@ -69,15 +69,7 @@ public class MainViewModel : INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
-
     
-    protected bool Set<T>(ref T backingField, T value, [CallerMemberName]string propertyName = "")
-    {
-        if (Equals(backingField, value)) return false;
-        backingField = value;
-        OnPropertyChanged(propertyName);
-        return true;
-    }
     
     // Method to handle MouseLeftButtonDown event
     public void OnMouseDown(object sender, MouseButtonEventArgs e)
