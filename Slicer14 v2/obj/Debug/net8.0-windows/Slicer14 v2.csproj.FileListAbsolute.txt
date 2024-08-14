@@ -44,3 +44,5 @@ C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\To
 C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\SideBar.baml
 C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\ViewportControl.g.cs
 C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\ViewportControl.baml
+C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\RightSidePanelControl.g.cs
+C:\Users\luism\RiderProjects\Slicer14 v2\Slicer14 v2\obj\Debug\net8.0-windows\RightSidePanelControl.baml

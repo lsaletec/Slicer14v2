@@ -12,28 +12,39 @@
         <local:MainViewModel/>
     </Window.DataContext>
     <DockPanel>
-    <!-- Import the TopBarControl -->
-    <local:TopBarControl DockPanel.Dock="Top"/>
-    <Grid>
-        <!-- Define a 3-column grid: side panel, splitter, and main content area -->
-        <Grid.ColumnDefinitions>
-            <!-- Side panel column: Set an initial width and allow resizing -->
-            <ColumnDefinition Width="200"/>
-            <!-- GridSplitter column: This will allow the user to resize the side panel -->
-            <ColumnDefinition Width="5"/>
-            <!-- Main content area: Takes up the rest of the space -->
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        <!-- Import the TopBarControl -->
+        <local:TopBarControl DockPanel.Dock="Top"/>
+        <Grid>
+            <!-- Define a 5-column grid: left side panel, left splitter, main content, right splitter, right side panel -->
+            <Grid.ColumnDefinitions>
+                <!-- Left side panel column -->
+                <ColumnDefinition Width="200"/>
+                <!-- Left GridSplitter column -->
+                <ColumnDefinition Width="5"/>
+                <!-- Main content area -->
+                <ColumnDefinition Width="*"/>
+                <!-- Right GridSplitter column -->
+                <ColumnDefinition Width="5"/>
+                <!-- Right side panel column -->
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
 
-        <!-- Side panel -->
-        <local:SidePanelControl Grid.Column="0"/>
+            <!-- Left Side panel -->
+            <local:SidePanelControl Grid.Column="0"/>
 
-        <!-- GridSplitter -->
-        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                      Background="Gray" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns"/>
-        
-        <!-- Main content area with Helix 3D viewport -->
-        <local:ViewportControl Grid.Column="2" DataContext="{Binding}"/>
-    </Grid>
+            <!-- Left GridSplitter -->
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                          Background="Gray" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns"/>
+
+            <!-- Main content area with Helix 3D viewport -->
+            <local:ViewportControl Grid.Column="2" DataContext="{Binding}"/>
+
+            <!-- Right GridSplitter -->
+            <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                          Background="Gray" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns"/>
+
+            <!-- Right Side panel -->
+            <local:RightSidePanelControl Grid.Column="4"/>
+        </Grid>
     </DockPanel>
 </Window>

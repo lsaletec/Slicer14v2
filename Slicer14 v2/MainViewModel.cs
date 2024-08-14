@@ -29,11 +29,17 @@ public class MainViewModel : INotifyPropertyChanged
             {
                 _selectedModel = value;
                 Console.WriteLine($"SelectedModel set: {(_selectedModel != null ? _selectedModel.ToString() : "null")}");
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(SelectedModel));
                 UpdateManipulator();
+                
             }
         }
     }
+    protected void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
     
     private bool _isManipulatorVisible;
     public bool IsManipulatorVisible
@@ -44,7 +50,6 @@ public class MainViewModel : INotifyPropertyChanged
             if (_isManipulatorVisible != value)
             {
                 _isManipulatorVisible = value;
-                OnPropertyChanged();
             }
         }
     }
@@ -65,11 +70,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    protected void OnPropertyChanged([CallerMemberName]string info = "")
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
-    }
-
+    
     protected bool Set<T>(ref T backingField, T value, [CallerMemberName]string propertyName = "")
     {
         if (Equals(backingField, value)) return false;
@@ -149,7 +150,6 @@ public class MainViewModel : INotifyPropertyChanged
             if (_manipulatorPosition != value)
             {
                 _manipulatorPosition = value;
-                OnPropertyChanged();
             }
         }
     }
