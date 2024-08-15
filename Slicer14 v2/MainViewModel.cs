@@ -64,12 +64,15 @@ public class MainViewModel : INotifyPropertyChanged
             LookDirection = new Vector3D(-10, -10, -10),
             UpDirection = new Vector3D(0, 1, 0)
         };
+        
         LoadModelCommand = new RelayCommand(LoadModel);
         ResetTransformsCommand = new RelayCommand(ResetTransforms);
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
     
+    private Point _lastMousePosition;
+    private bool _isPanning;
     
     // Method to handle MouseLeftButtonDown event
     public void OnMouseDown(object sender, MouseButtonEventArgs e)
