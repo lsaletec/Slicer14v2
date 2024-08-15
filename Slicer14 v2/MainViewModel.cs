@@ -27,14 +27,37 @@ public class MainViewModel : INotifyPropertyChanged
         {
             if (_selectedModel != value)
             {
+                if (_selectedModel is MeshGeometryModel3D meshModel)
+                {
+                    meshModel.PostEffects = String.Empty;
+                }
                 _selectedModel = value;
                 Console.WriteLine($"SelectedModel set: {(_selectedModel != null ? _selectedModel.ToString() : "null")}");
                 OnPropertyChanged(nameof(SelectedModel));
                 UpdateManipulator();
-                
+                FindSelected();
+
             }
         }
     }
+
+    private void FindSelected()
+    {
+        if (_selectedModel != null)
+        {
+            int index = 0;
+            for (int i = 0; i < Models.Count; i++)
+            {
+                if (Models[i].Tag == _selectedModel.Tag)
+                {
+                    Console.WriteLine($"Found model {Models[i].Tag}");
+                    (Models[i] as MeshGeometryModel3D).PostEffects = "border[color:#00FFDE]";
+                }
+            }
+        }
+        
+    }
+    
     protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         Console.WriteLine($"OnPropertyChanged called for {propertyName}");
@@ -88,11 +111,13 @@ public class MainViewModel : INotifyPropertyChanged
                    // Check if the hit object is a MeshGeometryModel3D
                    if (hit.ModelHit is MeshGeometryModel3D hitModel)
                    {
+                       //hitModel.PostEffects =  "border[color:#00FFDE]";
                        // Check if the Models collection contains a model with the same Tag
                        foreach (var model in Models)
                        {
                            if (model is MeshGeometryModel3D meshModel && Equals(meshModel.Tag, hitModel.Tag))
                            {
+                               meshModel.PostEffects = "border[color:#00FFDE]";
                                SelectedModel = meshModel;
                                Console.WriteLine($"Selected Model Tag: {meshModel.Tag}");
                                Console.WriteLine($"Selected Model Name: {meshModel.Name}");
@@ -101,6 +126,7 @@ public class MainViewModel : INotifyPropertyChanged
                        }
                        break; // Stop searching hits after finding a MeshGeometryModel3D
                    }
+                   
                } 
             }
             else

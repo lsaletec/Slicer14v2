@@ -10,9 +10,10 @@
     </UserControl.Resources>
     <Grid>
         <hx:Viewport3DX x:Name="viewport"
+                        BackgroundColor="Black"
                         Camera="{Binding Camera}"
                         EffectsManager="{Binding EffectsManager}"
-                        EnableD2DRendering="False"
+                        EnableD2DRendering="True"
                         MouseDown="Viewport_MouseDown"
                         MouseMove="Viewport_MouseMove"
                         MouseUp="Viewport_MouseUp">
@@ -20,10 +21,16 @@
             <hx:ItemsModel3D ItemsSource="{Binding Models}">
                 <hx:ItemsModel3D.ItemTemplate>
                     <DataTemplate>
-                        <hx:MeshGeometryModel3D Geometry="{Binding Geometry}" Material="{Binding Material}" Transform="{Binding Transform, Mode=TwoWay}" Tag="{Binding Tag}" />
+                        <hx:MeshGeometryModel3D Geometry="{Binding Geometry}" Material="{Binding Material}" Transform="{Binding Transform, Mode=TwoWay}" Tag="{Binding Tag}" PostEffects="{Binding PostEffects}"/>
                     </DataTemplate>
                 </hx:ItemsModel3D.ItemTemplate>
             </hx:ItemsModel3D>
+            <hx:PostEffectMeshBorderHighlight
+                x:Name="border"
+                EffectName="border"
+                Color="Cyan"
+                NumberOfBlurPass="2"
+                />
             <!-- Manipulator for transformations -->
             <hx:TransformManipulator3D x:Name="manipulator"
                                        Tag="manipulator"

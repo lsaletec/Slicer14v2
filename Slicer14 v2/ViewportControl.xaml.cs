@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media.Media3D;
+using HelixToolkit.Wpf.SharpDX;
 using ProjectionCamera = HelixToolkit.Wpf.SharpDX.ProjectionCamera;
 
 namespace Slicer14_v2
@@ -21,6 +22,25 @@ namespace Slicer14_v2
             if (DataContext is MainViewModel vm)
             {
                 vm.OnMouseDown(sender, e);
+            }
+        }
+        private void FindSelected()
+        {
+            if (DataContext is MainViewModel vm)
+            {
+
+                if (vm.SelectedModel != null)
+                {
+                    int index = 0;
+                    for (int i = 0; i < vm.Models.Count; i++)
+                    {
+                        if (vm.Models[i].Tag == vm.SelectedModel.Tag)
+                        {
+                            Console.WriteLine($"Found model {vm.Models[i].Tag}");
+                            (vm.Models[i] as MeshGeometryModel3D).PostEffects = "border[color:#00FFDE]";
+                        }
+                    }
+                }
             }
         }
         private Point _lastMousePosition;
