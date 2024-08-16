@@ -30,7 +30,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Left Side panel -->
-            <local:SidePanelControl Grid.Column="0"/>
+            <local:SidePanelControl Grid.Column="0" DataContext="{Binding}"/>
 
             <!-- Left GridSplitter -->
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"

@@ -15,6 +15,21 @@ public class MainViewModel : INotifyPropertyChanged
 {
     public EffectsManager EffectsManager { get; }
     public Camera Camera { get; }
+
+    private bool _showBoundingBox;
+    public bool ShowBoundingBox
+    {
+        get => _showBoundingBox;
+        set
+        {
+            if (_showBoundingBox != value)
+            {
+                _showBoundingBox = value;
+                OnPropertyChanged(nameof(ShowBoundingBox));
+            }
+        }
+    }
+
     public ObservableCollection<Element3D> Models { get; } = new ObservableCollection<Element3D>();
     public ICommand LoadModelCommand { get; }
     public ICommand ResetTransformsCommand { get; }
