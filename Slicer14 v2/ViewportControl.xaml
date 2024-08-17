@@ -18,6 +18,13 @@
                         MouseMove="Viewport_MouseMove"
                         MouseUp="Viewport_MouseUp"
                         KeyDown="Viewport_Keydown">
+            <hx:GroupModel3D>
+                <hx:GroupModel3D.Children>
+                    <hx:MeshGeometryModel3D Geometry="{Binding CurrentSelection.selectionCenter.Geometry}"
+                                            Material="{Binding CurrentSelection.selectionCenter.Material}"
+                                            Transform="{Binding CurrentSelection.selectionCenter.Transform}"/>
+                </hx:GroupModel3D.Children>
+            </hx:GroupModel3D>
             <hx:DirectionalLight3D Color="White" Direction="-1,-1,-1"/>
             <hx:ItemsModel3D ItemsSource="{Binding Models}">
                 <hx:ItemsModel3D.ItemTemplate>
@@ -34,8 +41,8 @@
                 />
             <!-- Manipulator for transformations -->
             <hx:TransformManipulator3D x:Name="manipulator"
-                                        Target="{Binding CurrentSelection.SelectedObjects[0]}"
-                                        Transform="{Binding ManipulatorTransform, Mode=TwoWay}"
+                                        Target="{Binding CurrentSelection.selectionCenter}"
+                                        Transform="{Binding CurrentSelection.selectionCenter.Transform, Mode=TwoWay}"
                                         Visibility="{Binding IsManipulatorVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
 

@@ -62,30 +62,8 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    private Transform3D _manipulatorTransform;
-    public Transform3D ManipulatorTransform
-    {
-        get => _manipulatorTransform;
-        set
-        {
-            if (_manipulatorTransform != value)
-            {
-                _manipulatorTransform = value;
-                OnPropertyChanged(nameof(ManipulatorTransform));
-                // Update the transform of the group model when the manipulator changes
-                UpdateGroupModelTransform();
-            }
-        }
-    }
-    // Method to update the transform of the group model
-    private void UpdateGroupModelTransform()
-    {
-        if (CurrentSelection?.groupModel3D != null)
-        {
-            CurrentSelection.groupModel3D.Transform = ManipulatorTransform;
-        }
-    }
-
+    private ModelLoader _modelLoader;
+    
     public MainViewModel()
     {
         EffectsManager = new DefaultEffectsManager();
@@ -97,9 +75,9 @@ public class MainViewModel : INotifyPropertyChanged
         };
         
         LoadModelCommand = new RelayCommand(LoadModel);
-        ResetTransformsCommand = new RelayCommand(ResetTransforms);
         DeleteModelCommand = new RelayCommand(DeleteSelectedModel);
         _currentSelection = new Selection();
+        _modelLoader = new ModelLoader(Models);
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -157,7 +135,7 @@ public class MainViewModel : INotifyPropertyChanged
         if (CurrentSelection.groupModel3D.Children.Count> 0)
         {
             // Calculate the center of the model's bounds
-            var center = _currentSelection.CustomBounds.Center();
+            var center = _currentSelection.selectionCenter.Bounds.Center();
             Console.WriteLine($"center {center}");
           
             // Set the manipulator's position to the center
@@ -188,122 +166,9 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
     
-    private void ResetTransforms()
-    {
-        foreach (var model in Models)
-        {
-            if (model is MeshGeometryModel3D meshModel)
-            {
-                meshModel.Transform = new TranslateTransform3D(0, 0, 0);
-            }
-        }
-    }
-
     private void LoadModel()
     {
-        var openFileDialog = new Microsoft.Win32.OpenFileDialog
-        {
-            Filter = "3D Models|*.obj;*.fbx;*.dae,*.stl|All Files|*.*"
-        };
-
-        if (openFileDialog.ShowDialog() == true)
-        {
-            Load3DModel(openFileDialog.FileName);
-        }
-    }
-
-       public void Load3DModel(string filePath)
-{
-    var importer = new AssimpContext();
-    var scene = importer.ImportFile(filePath, PostProcessSteps.Triangulate | PostProcessSteps.GenerateNormals | PostProcessSteps.FlipUVs);
-
-    if (scene == null || scene.RootNode == null)
-    {
-        throw new System.Exception("Failed to load model.");
-    }
-
-    var fileName = System.IO.Path.GetFileNameWithoutExtension(filePath);
-    
-
-    foreach (var mesh in scene.Meshes)
-    {
-        var positions = new List<Vector3>();
-        var normals = new List<Vector3>();
-        var indices = new List<int>();
-
-        for (int i = 0; i < mesh.VertexCount; i++)
-        {
-            positions.Add(new Vector3(mesh.Vertices[i].X, mesh.Vertices[i].Y, mesh.Vertices[i].Z));
-            normals.Add(new Vector3(mesh.Normals[i].X, mesh.Normals[i].Y, mesh.Normals[i].Z));
-        }
-
-        for (int i = 0; i < mesh.FaceCount; i++)
-        {
-            indices.AddRange(mesh.Faces[i].Indices);
-        }
-
-        // Calculate the model's center
-        var modelCenter = CalculateModelCenter(positions);
-
-        // Adjust each vertex position relative to the model's center
-        for (int i = 0; i < positions.Count; i++)
-        {
-            positions[i] -= modelCenter;
-        }
-
-        var helixMesh = new MeshGeometry3D
-        {
-            Positions = new Vector3Collection(positions),
-            Normals = new Vector3Collection(normals),
-            Indices = new IntCollection(indices)
-        };
-
-        var material = new PhongMaterial
-        {
-            DiffuseColor = Color.White.ToColor4()
-        };
-        fileName = GenerateUniqueName(fileName);
-        var model = new MeshGeometryModel3D
-        {
-            Geometry = helixMesh,
-            Material = material,
-            Transform = new TranslateTransform3D(0, 0, 0), // No additional transform needed
-            Name = fileName, // Assign the file name as the model name,
-            Tag = fileName // Use the Tag to store the identifier
-        };
-
-        Models.Add(model);
+        _modelLoader.Load();
     }
 }
 
-// Helper method to generate a unique name
-private string GenerateUniqueName(string baseName)
-{
-    string uniqueName = baseName;
-    int counter = 1;
-
-    while (Models.Any(m => m.Tag?.ToString() == uniqueName))
-    {
-        uniqueName = $"{baseName}{counter++}";
-    }
-
-    return uniqueName;
-}
-
-private Vector3 CalculateModelCenter(List<Vector3> positions)
-{
-    if (positions.Count == 0)
-    {
-        return new Vector3(0, 0, 0);
-    }
-
-    Vector3 sum = Vector3.Zero;
-    foreach (var pos in positions)
-    {
-        sum += pos;
-    }
-    
-    return sum / positions.Count;
-}
-
-}
