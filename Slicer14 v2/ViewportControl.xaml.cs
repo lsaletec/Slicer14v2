@@ -4,9 +4,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using HelixToolkit.Wpf.SharpDX;
+using SharpDX;
+using Color = System.Windows.Media.Color;
+using Point = System.Windows.Point;
 using ProjectionCamera = HelixToolkit.Wpf.SharpDX.ProjectionCamera;
 
 namespace Slicer14_v2
@@ -18,41 +20,19 @@ namespace Slicer14_v2
             InitializeComponent();
             this.DataContextChanged += ViewportControl_DataContextChanged;
 
-            if (manipulator != null && manipulator.Target != null)
+            if (manipulator != null)
             {
-                SubscribeToTransformChanges(manipulator.Target);
-            }
-
-            // Optionally, handle target changes
-            DependencyPropertyDescriptor dpd = DependencyPropertyDescriptor.FromProperty(TransformManipulator3D.TargetProperty, typeof(TransformManipulator3D));
-            if (dpd != null)
-            {
-                dpd.AddValueChanged(manipulator, (s, e) =>
+                DependencyPropertyDescriptor dpd = DependencyPropertyDescriptor.FromProperty(TransformManipulator3D.TargetProperty, typeof(TransformManipulator3D));
+                if (dpd != null)
                 {
-                    var newTarget = manipulator.Target;
-                    if (newTarget != null)
-                    {
-                        SubscribeToTransformChanges(newTarget);
-                    }
-                });
+                    dpd.AddValueChanged(manipulator, ManipulatorTargetChanged);
+                }
             }
         }
-
-        private void SubscribeToTransformChanges(Element3D target)
+        
+        private void ManipulatorTargetChanged(object sender, EventArgs e)
         {
-            // Subscribe to changes in the Transform property
-            DependencyPropertyDescriptor dpd = DependencyPropertyDescriptor.FromProperty(Element3D.TransformProperty, typeof(Element3D));
-            if (dpd != null)
-            {
-                dpd.AddValueChanged(target, OnTransformChanged);
-            }
-        }
-
-        private void OnTransformChanged(object sender, EventArgs e)
-        {
-            // Log the transformation change
-            var target = sender as Element3D;
-            if (target != null)
+            if (manipulator.Target is GroupModel3D group)
             {
                 UpdateBoundingBox();
             }
@@ -67,11 +47,11 @@ namespace Slicer14_v2
             RemoveBoundingBox();
 
             // Check if ShowBoundingBox is true
-            if (viewModel?.ShowBoundingBox == true && viewModel?.SelectedModel is MeshGeometryModel3D model)
+            if (viewModel?.ShowBoundingBox == true && viewModel?.CurrentSelection.groupModel3D.Children.Count>0)
             {
                 // Apply the model's transform to the bounding box
-                var boundingBox = BoundingBoxExtensions.FromPoints(model.Geometry.Positions);
-                boundingBox = boundingBox.Transform(model.Transform.Value.ToMatrix());
+                BoundingBox boundingBox = viewModel.CurrentSelection.CustomBounds;
+                boundingBox = boundingBox.Transform(viewModel.CurrentSelection.groupModel3D.Transform.Value.ToMatrix());
 
                 // Generate the bounding box lines using LineBuilder
                 var lineGeometry = LineBuilder.GenerateBoundingBox(boundingBox);
@@ -88,8 +68,6 @@ namespace Slicer14_v2
                 viewport.Items.Add(boundingBoxLines);
             }
         }
-
-
 
         private void RemoveBoundingBox()
         {
@@ -110,7 +88,7 @@ namespace Slicer14_v2
 
         private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(MainViewModel.SelectedModel) || e.PropertyName == nameof(MainViewModel.ShowBoundingBox))
+            if (e.PropertyName == nameof(MainViewModel.CurrentSelection) || e.PropertyName == nameof(MainViewModel.ShowBoundingBox))
             {
                 UpdateBoundingBox();
             }
@@ -136,26 +114,6 @@ namespace Slicer14_v2
                     if (vm.DeleteModelCommand.CanExecute(null))
                     {
                         vm.DeleteModelCommand.Execute(null);
-                    }
-                }
-            }
-        }
-        
-        private void FindSelected()
-        {
-            if (DataContext is MainViewModel vm)
-            {
-
-                if (vm.SelectedModel != null)
-                {
-                    int index = 0;
-                    for (int i = 0; i < vm.Models.Count; i++)
-                    {
-                        if (vm.Models[i].Tag == vm.SelectedModel.Tag)
-                        {
-                            Console.WriteLine($"Found model {vm.Models[i].Tag}");
-                            (vm.Models[i] as MeshGeometryModel3D).PostEffects = "border[color:#00FFDE]";
-                        }
                     }
                 }
             }

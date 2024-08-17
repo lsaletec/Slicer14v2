@@ -34,10 +34,9 @@
                 />
             <!-- Manipulator for transformations -->
             <hx:TransformManipulator3D x:Name="manipulator"
-                                       Tag="manipulator"
-                                       Target="{Binding SelectedModel}" 
-                                       Transform="{Binding ManipulatorPosition}"
-                                       Visibility="{Binding IsManipulatorVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                        Target="{Binding CurrentSelection.SelectedObjects[0]}"
+                                        Transform="{Binding ManipulatorTransform, Mode=TwoWay}"
+                                        Visibility="{Binding IsManipulatorVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
 
         </hx:Viewport3DX>

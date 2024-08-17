@@ -34,44 +34,6 @@ public class MainViewModel : INotifyPropertyChanged
     public ICommand LoadModelCommand { get; }
     public ICommand DeleteModelCommand { get; }
     public ICommand ResetTransformsCommand { get; }
-
-    private Element3D _selectedModel;
-    public Element3D SelectedModel
-    {
-        get => _selectedModel;
-        set
-        {
-            if (_selectedModel != value)
-            {
-                if (_selectedModel is MeshGeometryModel3D meshModel)
-                {
-                    meshModel.PostEffects = String.Empty;
-                }
-                _selectedModel = value;
-                OnPropertyChanged(nameof(SelectedModel));
-                UpdateManipulator();
-                FindSelected();
-
-            }
-        }
-    }
-
-    
-    private void FindSelected()
-    {
-        if (_selectedModel != null)
-        {
-            int index = 0;
-            for (int i = 0; i < Models.Count; i++)
-            {
-                if (Models[i].Tag == _selectedModel.Tag)
-                {
-                    (Models[i] as MeshGeometryModel3D).PostEffects = "border[color:#00FFDE]";
-                }
-            }
-        }
-        
-    }
     
     protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
@@ -90,7 +52,39 @@ public class MainViewModel : INotifyPropertyChanged
             }
         }
     }
+    private Selection _currentSelection;
+    public Selection CurrentSelection
+    {
+        get => _currentSelection;
+        set
+        {
+                _currentSelection = value;
+        }
+    }
 
+    private Transform3D _manipulatorTransform;
+    public Transform3D ManipulatorTransform
+    {
+        get => _manipulatorTransform;
+        set
+        {
+            if (_manipulatorTransform != value)
+            {
+                _manipulatorTransform = value;
+                OnPropertyChanged(nameof(ManipulatorTransform));
+                // Update the transform of the group model when the manipulator changes
+                UpdateGroupModelTransform();
+            }
+        }
+    }
+    // Method to update the transform of the group model
+    private void UpdateGroupModelTransform()
+    {
+        if (CurrentSelection?.groupModel3D != null)
+        {
+            CurrentSelection.groupModel3D.Transform = ManipulatorTransform;
+        }
+    }
 
     public MainViewModel()
     {
@@ -105,6 +99,7 @@ public class MainViewModel : INotifyPropertyChanged
         LoadModelCommand = new RelayCommand(LoadModel);
         ResetTransformsCommand = new RelayCommand(ResetTransforms);
         DeleteModelCommand = new RelayCommand(DeleteSelectedModel);
+        _currentSelection = new Selection();
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -113,13 +108,14 @@ public class MainViewModel : INotifyPropertyChanged
     private bool _isPanning;
     private void DeleteSelectedModel()
     {
-        if (SelectedModel != null)
+        if (_currentSelection != null)
         {
-            Models.Remove(SelectedModel);
-            SelectedModel = null; // Clear the selection after deletion
+            foreach (var model in _currentSelection.SelectedObjects)
+            {
+                Models.Remove(model);
+            }
         }
     }
-    // Method to handle MouseLeftButtonDown event
     public void OnMouseDown(object sender, MouseButtonEventArgs e)
     {
         var viewport = sender as Viewport3DX;
@@ -127,56 +123,54 @@ public class MainViewModel : INotifyPropertyChanged
         { 
             var hits = viewport.FindHits(e.GetPosition(viewport));
             if (hits.Count>0)
-            {
+            { 
+                var isShiftPressed = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
                foreach (var hit in hits)
                {
                    // Check if the hit object is a MeshGeometryModel3D
                    if (hit.ModelHit is MeshGeometryModel3D hitModel)
                    {
-                       //hitModel.PostEffects =  "border[color:#00FFDE]";
                        // Check if the Models collection contains a model with the same Tag
                        foreach (var model in Models)
                        {
                            if (model is MeshGeometryModel3D meshModel && Equals(meshModel.Tag, hitModel.Tag))
                            {
-                               meshModel.PostEffects = "border[color:#00FFDE]";
-                               SelectedModel = meshModel;
-                               break; // Stop searching after finding the matching model
+                               _currentSelection.HandleSelection(meshModel,isShiftPressed);
+                               OnPropertyChanged(nameof(CurrentSelection));
                            }
                        }
                        break; // Stop searching hits after finding a MeshGeometryModel3D
                    }
-                   
                } 
             }
             else
             {
-               SelectedModel = null; 
+                _currentSelection.Clear(); 
             }
+            UpdateManipulator();
         }
     }
 
     private void UpdateManipulator()
     {
         // Check if the selected model is a MeshGeometryModel3D
-        if (SelectedModel is MeshGeometryModel3D meshModel)
+        if (CurrentSelection.groupModel3D.Children.Count> 0)
         {
             // Calculate the center of the model's bounds
-            var bounds = meshModel.Bounds;
-            var center = bounds.Center;
-
+            var center = _currentSelection.CustomBounds.Center();
+            Console.WriteLine($"center {center}");
+          
             // Set the manipulator's position to the center
             ManipulatorPosition = new TranslateTransform3D(center.X, center.Y, center.Z);
-
+          
             // Make the manipulator visible
-            IsManipulatorVisible = true;
+            IsManipulatorVisible = true;  
         }
         else
         {
-            // If no model is selected or it's not a MeshGeometryModel3D, hide the manipulator
-            IsManipulatorVisible = false;
+            IsManipulatorVisible = false;   
         }
-
+      
         OnPropertyChanged(nameof(ManipulatorPosition));
         OnPropertyChanged(nameof(IsManipulatorVisible));
     }

@@ -29,7 +29,7 @@ public partial class RightSidePanelControl : UserControl
     }
     private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(MainViewModel.SelectedModel))
+        /*if (e.PropertyName == nameof(MainViewModel.SelectedModel))
         {
             // Just show a message box or write to the console for testing
             var viewModel = (MainViewModel)sender;
@@ -40,7 +40,7 @@ public partial class RightSidePanelControl : UserControl
             {
                 SelectTreeViewItem(TreeView, selectedModel);
             }
-        }
+        }*/
     }
     private void SelectTreeViewItem(TreeView treeView, Element3D selectedModel)
 {
@@ -117,7 +117,7 @@ public partial class RightSidePanelControl : UserControl
     
     private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
-        if (e.NewValue is Element3D selectedElement)
+        /*if (e.NewValue is Element3D selectedElement)
         {
             // Set the ViewModel's SelectedModel property to the newly selected item in the TreeView
             var viewModel = DataContext as MainViewModel;
@@ -125,7 +125,7 @@ public partial class RightSidePanelControl : UserControl
             {
                 viewModel.SelectedModel = selectedElement;
             }
-        }
+        }*/
     }
 
 }
