@@ -32,6 +32,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     public ObservableCollection<Element3D> Models { get; } = new ObservableCollection<Element3D>();
     public ICommand LoadModelCommand { get; }
+    public ICommand DeleteModelCommand { get; }
     public ICommand ResetTransformsCommand { get; }
 
     private Element3D _selectedModel;
@@ -47,7 +48,6 @@ public class MainViewModel : INotifyPropertyChanged
                     meshModel.PostEffects = String.Empty;
                 }
                 _selectedModel = value;
-                Console.WriteLine($"SelectedModel set: {(_selectedModel != null ? _selectedModel.ToString() : "null")}");
                 OnPropertyChanged(nameof(SelectedModel));
                 UpdateManipulator();
                 FindSelected();
@@ -56,6 +56,7 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
+    
     private void FindSelected()
     {
         if (_selectedModel != null)
@@ -65,7 +66,6 @@ public class MainViewModel : INotifyPropertyChanged
             {
                 if (Models[i].Tag == _selectedModel.Tag)
                 {
-                    Console.WriteLine($"Found model {Models[i].Tag}");
                     (Models[i] as MeshGeometryModel3D).PostEffects = "border[color:#00FFDE]";
                 }
             }
@@ -75,7 +75,6 @@ public class MainViewModel : INotifyPropertyChanged
     
     protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
-        Console.WriteLine($"OnPropertyChanged called for {propertyName}");
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
     
@@ -105,13 +104,21 @@ public class MainViewModel : INotifyPropertyChanged
         
         LoadModelCommand = new RelayCommand(LoadModel);
         ResetTransformsCommand = new RelayCommand(ResetTransforms);
+        DeleteModelCommand = new RelayCommand(DeleteSelectedModel);
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
     
     private Point _lastMousePosition;
     private bool _isPanning;
-    
+    private void DeleteSelectedModel()
+    {
+        if (SelectedModel != null)
+        {
+            Models.Remove(SelectedModel);
+            SelectedModel = null; // Clear the selection after deletion
+        }
+    }
     // Method to handle MouseLeftButtonDown event
     public void OnMouseDown(object sender, MouseButtonEventArgs e)
     {
@@ -134,8 +141,6 @@ public class MainViewModel : INotifyPropertyChanged
                            {
                                meshModel.PostEffects = "border[color:#00FFDE]";
                                SelectedModel = meshModel;
-                               Console.WriteLine($"Selected Model Tag: {meshModel.Tag}");
-                               Console.WriteLine($"Selected Model Name: {meshModel.Name}");
                                break; // Stop searching after finding the matching model
                            }
                        }
@@ -165,7 +170,6 @@ public class MainViewModel : INotifyPropertyChanged
 
             // Make the manipulator visible
             IsManipulatorVisible = true;
-            Console.WriteLine($"Manipulator position set to: {center}");
         }
         else
         {
@@ -274,7 +278,6 @@ public class MainViewModel : INotifyPropertyChanged
             Tag = fileName // Use the Tag to store the identifier
         };
 
-        Console.WriteLine(model.Tag);
         Models.Add(model);
     }
 }

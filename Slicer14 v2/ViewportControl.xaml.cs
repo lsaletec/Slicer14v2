@@ -125,6 +125,22 @@ namespace Slicer14_v2
                 vm.OnMouseDown(sender, e);
             }
         }
+        
+        private void Viewport_Keydown(object sender, KeyEventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                if (e.Key == Key.Delete)
+                {
+                    // Execute the delete command if possible
+                    if (vm.DeleteModelCommand.CanExecute(null))
+                    {
+                        vm.DeleteModelCommand.Execute(null);
+                    }
+                }
+            }
+        }
+        
         private void FindSelected()
         {
             if (DataContext is MainViewModel vm)

@@ -16,7 +16,8 @@
                         EnableD2DRendering="True"
                         MouseDown="Viewport_MouseDown"
                         MouseMove="Viewport_MouseMove"
-                        MouseUp="Viewport_MouseUp">
+                        MouseUp="Viewport_MouseUp"
+                        KeyDown="Viewport_Keydown">
             <hx:DirectionalLight3D Color="White" Direction="-1,-1,-1"/>
             <hx:ItemsModel3D ItemsSource="{Binding Models}">
                 <hx:ItemsModel3D.ItemTemplate>
