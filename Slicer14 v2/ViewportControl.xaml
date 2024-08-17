@@ -4,7 +4,7 @@
              xmlns:hx="http://helix-toolkit.org/wpf/SharpDX"
              xmlns:local="clr-namespace:Slicer14_v2"
              x:Name="ViewportControlRoot"
-             DataContext="{Binding RelativeSource={RelativeSource Self}}">
+             DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}, Path=DataContext}">
     <UserControl.Resources>
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </UserControl.Resources>
@@ -40,10 +40,9 @@
                 NumberOfBlurPass="2"
                 />
             <!-- Manipulator for transformations -->
-            <hx:TransformManipulator3D x:Name="manipulator"
-                                        Target="{Binding CurrentSelection.selectionCenter}"
-                                        Transform="{Binding CurrentSelection.selectionCenter.Transform, Mode=TwoWay}"
-                                        Visibility="{Binding IsManipulatorVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <hx:TransformManipulator3D 
+                x:Name="manipulator"
+                Target="{Binding CurrentSelection.selectionCenter}"/>
 
 
         </hx:Viewport3DX>

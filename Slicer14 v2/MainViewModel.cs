@@ -29,28 +29,13 @@ public class MainViewModel : INotifyPropertyChanged
             }
         }
     }
-
     public ObservableCollection<Element3D> Models { get; } = new ObservableCollection<Element3D>();
     public ICommand LoadModelCommand { get; }
     public ICommand DeleteModelCommand { get; }
-    public ICommand ResetTransformsCommand { get; }
     
     protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-    
-    private bool _isManipulatorVisible;
-    public bool IsManipulatorVisible
-    {
-        get => _isManipulatorVisible;
-        set
-        {
-            if (_isManipulatorVisible != value)
-            {
-                _isManipulatorVisible = value;
-            }
-        }
     }
     private Selection _currentSelection;
     public Selection CurrentSelection
@@ -78,6 +63,7 @@ public class MainViewModel : INotifyPropertyChanged
         DeleteModelCommand = new RelayCommand(DeleteSelectedModel);
         _currentSelection = new Selection();
         _modelLoader = new ModelLoader(Models);
+        _currentSelection.PropertyChanged += OnSelectionPropertyChanged;
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -105,19 +91,18 @@ public class MainViewModel : INotifyPropertyChanged
                 var isShiftPressed = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
                foreach (var hit in hits)
                {
-                   // Check if the hit object is a MeshGeometryModel3D
                    if (hit.ModelHit is MeshGeometryModel3D hitModel)
                    {
-                       // Check if the Models collection contains a model with the same Tag
                        foreach (var model in Models)
                        {
                            if (model is MeshGeometryModel3D meshModel && Equals(meshModel.Tag, hitModel.Tag))
                            {
                                _currentSelection.HandleSelection(meshModel,isShiftPressed);
+                               Console.WriteLine("Handled selection");
                                OnPropertyChanged(nameof(CurrentSelection));
                            }
                        }
-                       break; // Stop searching hits after finding a MeshGeometryModel3D
+                       break;
                    }
                } 
             }
@@ -125,44 +110,18 @@ public class MainViewModel : INotifyPropertyChanged
             {
                 _currentSelection.Clear(); 
             }
-            UpdateManipulator();
         }
     }
-
-    private void UpdateManipulator()
+    private void OnSelectionPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        // Check if the selected model is a MeshGeometryModel3D
-        if (CurrentSelection.groupModel3D.Children.Count> 0)
+        if (e.PropertyName == nameof(Selection))
         {
-            // Calculate the center of the model's bounds
-            var center = _currentSelection.selectionCenter.Bounds.Center();
-            Console.WriteLine($"center {center}");
-          
-            // Set the manipulator's position to the center
-            ManipulatorPosition = new TranslateTransform3D(center.X, center.Y, center.Z);
-          
-            // Make the manipulator visible
-            IsManipulatorVisible = true;  
-        }
-        else
-        {
-            IsManipulatorVisible = false;   
-        }
-      
-        OnPropertyChanged(nameof(ManipulatorPosition));
-        OnPropertyChanged(nameof(IsManipulatorVisible));
-    }
-    
-    private Transform3D _manipulatorPosition;
-    public Transform3D ManipulatorPosition
-    {
-        get => _manipulatorPosition;
-        set
-        {
-            if (_manipulatorPosition != value)
+            if (CurrentSelection.SelectedObjects.Count > 0)
             {
-                _manipulatorPosition = value;
+                OnPropertyChanged(nameof(CurrentSelection)); // Forward the notification
+                Console.WriteLine($"currentSelection: {CurrentSelection.SelectedObjects[0].Transform.ToMatrix()}");
             }
+            
         }
     }
     
@@ -170,5 +129,6 @@ public class MainViewModel : INotifyPropertyChanged
     {
         _modelLoader.Load();
     }
+    
 }
 

@@ -28,10 +28,14 @@ public class ModelLoader
             model = Load3DModel(openFileDialog.FileName);
         }
 
-        foreach (var m in model)
+        if (model != null)
         {
-            Models.Add(m);
+            foreach (var m in model)
+            {
+                Models.Add(m);
+            }
         }
+        
     }
 
     public IList<MeshGeometryModel3D> Load3DModel(string filePath)

@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Data;
+using System.ComponentModel;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using HelixToolkit.Wpf.SharpDX;
@@ -11,41 +10,47 @@ namespace Slicer14_v2;
 public class Selection
 {
     public ObservableCollection<Element3D> SelectedObjects { get; private set; }
-    public GroupModel3D groupModel3D { get; private set; }
-    public MeshGeometryModel3D selectionCenter { get; private set;}
+    public MeshGeometryModel3D selectionCenter { get; private set; }
     public BoundingBox CustomBounds { get; private set; }
+
+    private Dictionary<Element3D, Matrix3D> initialOffsets;
 
     public Selection()
     {
         SelectedObjects = new ObservableCollection<Element3D>();
-        groupModel3D = new GroupModel3D();
-        selectionCenter= CreateSelectionCenterCube();
+        selectionCenter = CreateSelectionCenterCube();
+        initialOffsets = new Dictionary<Element3D, Matrix3D>();
     }
+
     private MeshGeometryModel3D CreateSelectionCenterCube()
     {
         var meshBuilder = new MeshBuilder();
-        meshBuilder.AddBox(new Vector3(0, 0, 0), 1, 1, 1); // Creates a 1x1x1 cube centered at the origin
+        meshBuilder.AddBox(new Vector3(0, 0, 0), 1, 1, 1);
 
         var geometry = meshBuilder.ToMeshGeometry3D();
 
         return new MeshGeometryModel3D
         {
             Geometry = geometry,
-            Material = new PhongMaterial { DiffuseColor = Colors.Red.ToColor4() }
+            Material = new PhongMaterial { DiffuseColor = Colors.Red.ToColor4() },
+            Transform = new MatrixTransform3D(Matrix3D.Identity)
         };
     }
+
     public void AddObject(Element3D obj)
     {
         if (!SelectedObjects.Contains(obj))
         {
             SelectedObjects.Add(obj);
         }
-        groupModel3D.Children.Add(obj);
-        
+        // Store the initial offset of each object relative to the selectionCenter
+        var initialTransform = obj.Transform.Value;
+        var selectionCenterTransform = selectionCenter.Transform.Value;
+        selectionCenterTransform.Invert(); // Invert the matrix
+        var relativeOffset = initialTransform * selectionCenterTransform;
+        initialOffsets[obj] = relativeOffset;
         UpdateCustomBounds();
-        UpdateSelectionCenter();
-        Console.WriteLine($"BoundingBox {CustomBounds.Height} Count:{groupModel3D.Children.Count} Is initialized:{groupModel3D.IsInitialized} " +
-                          $"{CustomBounds.Minimum.X} {CustomBounds.Minimum.Y} {CustomBounds.Minimum.Z}");
+        UpdateSelectionCenterPosition();  // Update the selectionCenter position
     }
 
     public void RemoveObject(Element3D obj)
@@ -54,79 +59,62 @@ public class Selection
         {
             if (obj is MeshGeometryModel3D meshModel)
             {
-                groupModel3D.Children.Remove(obj);
-                UpdateCustomBounds();
-                UpdateSelectionCenter();
-                meshModel.PostEffects = String.Empty;
+                meshModel.PostEffects = string.Empty;
             }
+            initialOffsets.Remove(obj);
             SelectedObjects.Remove(obj);
         }
     }
+    
+    private void UpdateSelectionCenterPosition()
+    {
+        if (!SelectedObjects.Any())
+        {
+            return;
+        }
+        var center = CustomBounds.Center;
+        selectionCenter.Transform = new TranslateTransform3D(center.X, center.Y, center.Z);
+    }
+
     public void Clear()
     {
         foreach (var model in SelectedObjects)
         {
             if (model is MeshGeometryModel3D meshModel)
             {
-                groupModel3D.Children.Remove(model);
                 meshModel.PostEffects = string.Empty;
             }
         }
 
-        UpdateCustomBounds();
-        UpdateSelectionCenter();
+        initialOffsets.Clear();
         SelectedObjects.Clear();
+        CustomBounds = new BoundingBox();
     }
 
     private void UpdateCustomBounds()
     {
-        if (!groupModel3D.Children.Any())
+        if (!SelectedObjects.Any())
         {
             CustomBounds = new BoundingBox();
             return;
         }
 
-        var firstBounds = groupModel3D.Children[0].Bounds;
+        var firstBounds = SelectedObjects[0].Bounds;
         CustomBounds = new BoundingBox(firstBounds.Minimum, firstBounds.Maximum);
+        if (SelectedObjects.Count > 1)
+        {
+          foreach (var child in SelectedObjects)
+          {
+              CustomBounds = BoundingBox.Merge(CustomBounds, child.Bounds);
+          }  
+        }
+        
+    }
 
-        foreach (var child in groupModel3D.Children)
-        {
-            CustomBounds = BoundingBox.Merge(CustomBounds, child.Bounds);
-        }
-    }
-    private void UpdateSelectionCenter()
-    {
-        if (groupModel3D.Children.Count > 0)
-        {
-            var center = CustomBounds.Center();
-
-            // Update the position of the selectionCenter to the center of the bounding box
-            selectionCenter.Transform = new TranslateTransform3D(center.X, center.Y, center.Z);
-        }
-        else
-        {
-            selectionCenter.Transform = new TranslateTransform3D(0, 0, 0);
-        }
-    }
-    
-    public void ApplyTransformToSelectedObjects(Transform3D transform)
-    {
-        foreach (var obj in SelectedObjects)
-        {
-            if (obj is MeshGeometryModel3D meshModel)
-            {
-                var transformGroup = new Transform3DGroup();
-                transformGroup.Children.Add(meshModel.Transform);
-                transformGroup.Children.Add(transform);
-                meshModel.Transform = transformGroup;
-            }
-        }
-    }
     public void HandleSelection(MeshGeometryModel3D meshModel, bool isShiftPressed)
     {
         if (SelectedObjects.Contains(meshModel))
         {
-            Console.WriteLine("Removing model");
             RemoveObject(meshModel);
         }
         else
@@ -142,5 +130,28 @@ public class Selection
                 AddObject(meshModel);
             }
         }
+    }
+    
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void ApplyTransformToSelectedGroup()
+    {
+        var selectionCenterMatrix = selectionCenter.Transform.Value;
+
+        foreach (var obj in SelectedObjects)
+        {
+            if (obj is MeshGeometryModel3D meshModel)
+            {
+                var initialOffset = initialOffsets[obj];
+                var finalTransform = initialOffset * selectionCenterMatrix;
+                meshModel.Transform = new MatrixTransform3D(finalTransform);
+            }
+        }
+        UpdateCustomBounds();
+        OnPropertyChanged(nameof(Selection));
     }
 }

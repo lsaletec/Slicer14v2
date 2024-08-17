@@ -27,9 +27,21 @@ namespace Slicer14_v2
                 {
                     dpd.AddValueChanged(manipulator, ManipulatorTargetChanged);
                 }
+
+                manipulator.Mouse3DMove += MoveChanged;
+
             }
         }
-        
+
+        private void MoveChanged(object sender, EventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                vm.CurrentSelection.ApplyTransformToSelectedGroup();
+            }
+            
+        }
+
         private void ManipulatorTargetChanged(object sender, EventArgs e)
         {
             if (manipulator.Target is GroupModel3D group)
@@ -47,11 +59,11 @@ namespace Slicer14_v2
             RemoveBoundingBox();
 
             // Check if ShowBoundingBox is true
-            if (viewModel?.ShowBoundingBox == true && viewModel?.CurrentSelection.groupModel3D.Children.Count>0)
+            if (viewModel?.ShowBoundingBox == true && viewModel?.CurrentSelection.SelectedObjects.Count>0)
             {
                 // Apply the model's transform to the bounding box
                 BoundingBox boundingBox = viewModel.CurrentSelection.CustomBounds;
-                boundingBox = boundingBox.Transform(viewModel.CurrentSelection.groupModel3D.Transform.Value.ToMatrix());
+                boundingBox = boundingBox.Transform(viewModel.CurrentSelection.selectionCenter.Transform.ToMatrix());
 
                 // Generate the bounding box lines using LineBuilder
                 var lineGeometry = LineBuilder.GenerateBoundingBox(boundingBox);
@@ -93,7 +105,6 @@ namespace Slicer14_v2
                 UpdateBoundingBox();
             }
         }
-
         
         // Pass MouseDown event to ViewModel
         private void Viewport_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -103,6 +114,7 @@ namespace Slicer14_v2
                 vm.OnMouseDown(sender, e);
             }
         }
+        
         
         private void Viewport_Keydown(object sender, KeyEventArgs e)
         {
