@@ -42,7 +42,10 @@
             <!-- Manipulator for transformations -->
             <hx:TransformManipulator3D 
                 x:Name="manipulator"
-                Target="{Binding CurrentSelection.selectionCenter}"/>
+                Target="{Binding CurrentSelection.selectionCenter}"
+                Transform="{Binding ManipulatorPosition}"
+                Visibility="{Binding IsManipulatorVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                />
 
 
         </hx:Viewport3DX>

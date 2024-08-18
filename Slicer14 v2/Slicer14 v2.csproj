@@ -14,4 +14,45 @@
       <PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="2.25.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="bin\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="bin\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Page Remove="bin\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="bin\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="bin\Debug\net8.0-windows\AssimpNet.dll" />
+      <Content Include="bin\Debug\net8.0-windows\Cyotek.Drawing.BitmapFont.dll" />
+      <Content Include="bin\Debug\net8.0-windows\HelixToolkit.dll" />
+      <Content Include="bin\Debug\net8.0-windows\HelixToolkit.Wpf.SharpDX.dll" />
+      <Content Include="bin\Debug\net8.0-windows\Microsoft.Extensions.Logging.Abstractions.dll" />
+      <Content Include="bin\Debug\net8.0-windows\runtimes\linux-x64\native\libassimp.so" />
+      <Content Include="bin\Debug\net8.0-windows\runtimes\osx-x64\native\libassimp.dylib" />
+      <Content Include="bin\Debug\net8.0-windows\runtimes\win-x64\native\assimp.dll" />
+      <Content Include="bin\Debug\net8.0-windows\runtimes\win-x86\native\assimp.dll" />
+      <Content Include="bin\Debug\net8.0-windows\SharpDX.D3DCompiler.dll" />
+      <Content Include="bin\Debug\net8.0-windows\SharpDX.Direct2D1.dll" />
+      <Content Include="bin\Debug\net8.0-windows\SharpDX.Direct3D11.dll" />
+      <Content Include="bin\Debug\net8.0-windows\SharpDX.Direct3D9.dll" />
+      <Content Include="bin\Debug\net8.0-windows\SharpDX.dll" />
+      <Content Include="bin\Debug\net8.0-windows\SharpDX.DXGI.dll" />
+      <Content Include="bin\Debug\net8.0-windows\SharpDX.Mathematics.dll" />
+      <Content Include="bin\Debug\net8.0-windows\Slicer14 v2.deps.json" />
+      <Content Include="bin\Debug\net8.0-windows\Slicer14 v2.dll" />
+      <Content Include="bin\Debug\net8.0-windows\Slicer14 v2.exe" />
+      <Content Include="bin\Debug\net8.0-windows\Slicer14 v2.pdb" />
+      <Content Include="bin\Debug\net8.0-windows\Slicer14 v2.runtimeconfig.json" />
+      <Content Include="obj\project.assets.json" />
+    </ItemGroup>
+
 </Project>

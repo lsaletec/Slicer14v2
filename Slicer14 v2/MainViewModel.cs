@@ -35,6 +35,7 @@ public class MainViewModel : INotifyPropertyChanged
     
     protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
+        Console.WriteLine($"OnPropertyChanged called for {propertyName}");
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
     private Selection _currentSelection;
@@ -97,9 +98,9 @@ public class MainViewModel : INotifyPropertyChanged
                        {
                            if (model is MeshGeometryModel3D meshModel && Equals(meshModel.Tag, hitModel.Tag))
                            {
-                               _currentSelection.HandleSelection(meshModel,isShiftPressed);
-                               Console.WriteLine("Handled selection");
+                               _currentSelection.HandleSelection(meshModel,isShiftPressed); ;
                                OnPropertyChanged(nameof(CurrentSelection));
+                               UpdateManipulator();
                            }
                        }
                        break;
@@ -108,10 +109,58 @@ public class MainViewModel : INotifyPropertyChanged
             }
             else
             {
-                _currentSelection.Clear(); 
+                _currentSelection.Clear();
+                IsManipulatorVisible = false;
+            }
+        }
+        OnPropertyChanged(nameof(ManipulatorPosition));
+        OnPropertyChanged(nameof(IsManipulatorVisible));
+    }
+    
+    private bool _isManipulatorVisible;
+    public bool IsManipulatorVisible
+    {
+        get => _isManipulatorVisible;
+        set
+        {
+                _isManipulatorVisible = value;
+        }
+    }
+    
+    private void UpdateManipulator()
+    {
+        if (_currentSelection.SelectedObjects.Count > 0)
+        {
+            var bounds = _currentSelection.UnmodifiedBounds;
+            var center = bounds.Center;
+            ManipulatorPosition = new TranslateTransform3D(center.X, center.Y, center.Z);
+            IsManipulatorVisible = true;
+
+            // Notify UI of the updates
+            OnPropertyChanged(nameof(ManipulatorPosition));
+            OnPropertyChanged(nameof(IsManipulatorVisible));
+        }
+        else
+        {
+            IsManipulatorVisible = false;
+            OnPropertyChanged(nameof(IsManipulatorVisible));
+        }
+    }
+
+    private Transform3D _manipulatorPosition;
+    public Transform3D ManipulatorPosition
+    {
+        get => _manipulatorPosition;
+        set
+        {
+            if (_manipulatorPosition != value)
+            {
+                _manipulatorPosition = value;
             }
         }
     }
+    
+    
     private void OnSelectionPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(Selection))
@@ -119,9 +168,13 @@ public class MainViewModel : INotifyPropertyChanged
             if (CurrentSelection.SelectedObjects.Count > 0)
             {
                 OnPropertyChanged(nameof(CurrentSelection)); // Forward the notification
-                Console.WriteLine($"currentSelection: {CurrentSelection.SelectedObjects[0].Transform.ToMatrix()}");
             }
             
+        }
+
+        if (e.PropertyName == nameof(CurrentSelection.selectionCenter))
+        {
+            OnPropertyChanged(nameof(CurrentSelection.selectionCenter)); // Forward the notification
         }
     }
     

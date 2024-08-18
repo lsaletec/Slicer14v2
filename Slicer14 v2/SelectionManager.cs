@@ -12,6 +12,7 @@ public class Selection
     public ObservableCollection<Element3D> SelectedObjects { get; private set; }
     public MeshGeometryModel3D selectionCenter { get; private set; }
     public BoundingBox CustomBounds { get; private set; }
+    public BoundingBox UnmodifiedBounds { get; private set; }
 
     private Dictionary<Element3D, Matrix3D> initialOffsets;
 
@@ -43,14 +44,15 @@ public class Selection
         {
             SelectedObjects.Add(obj);
         }
-        // Store the initial offset of each object relative to the selectionCenter
+        
+        Console.WriteLine($"Position of first object:{SelectedObjects[0].Transform.ToMatrix()}");
+        UpdateCustomBounds();
+        UpdateSelectionCenterPosition(); 
         var initialTransform = obj.Transform.Value;
         var selectionCenterTransform = selectionCenter.Transform.Value;
         selectionCenterTransform.Invert(); // Invert the matrix
         var relativeOffset = initialTransform * selectionCenterTransform;
         initialOffsets[obj] = relativeOffset;
-        UpdateCustomBounds();
-        UpdateSelectionCenterPosition();  // Update the selectionCenter position
     }
 
     public void RemoveObject(Element3D obj)
@@ -99,17 +101,24 @@ public class Selection
             return;
         }
 
-        var firstBounds = SelectedObjects[0].Bounds;
+        // Start with the transformed bounds of the first selected object
+        Console.WriteLine($"CustomBounds1: ({SelectedObjects[0].Bounds.Center.X}, {SelectedObjects[0].Bounds.Center.Y}, {SelectedObjects[0].Bounds.Center.Z})");
+        var firstBounds2 = SelectedObjects[0].Bounds;
+        var firstBounds = SelectedObjects[0].Bounds.Transform(SelectedObjects[0].Transform.ToMatrix());
         CustomBounds = new BoundingBox(firstBounds.Minimum, firstBounds.Maximum);
-        if (SelectedObjects.Count > 1)
+        UnmodifiedBounds = new BoundingBox(firstBounds2.Minimum, firstBounds2.Maximum);
+
+        // If there are more objects, merge their transformed bounds into CustomBounds
+        foreach (var child in SelectedObjects.Skip(1))  // Skip the first one since it's already used
         {
-          foreach (var child in SelectedObjects)
-          {
-              CustomBounds = BoundingBox.Merge(CustomBounds, child.Bounds);
-          }  
+            var transformedBounds = child.Bounds.Transform(child.Transform.ToMatrix());
+            CustomBounds = BoundingBox.Merge(CustomBounds, transformedBounds);
+            UnmodifiedBounds = BoundingBox.Merge(UnmodifiedBounds, child.Bounds);
         }
-        
+
+        Console.WriteLine($"CustomBounds2: ({CustomBounds.Center.X}, {CustomBounds.Center.Y}, {CustomBounds.Center.Z})");
     }
+
 
     public void HandleSelection(MeshGeometryModel3D meshModel, bool isShiftPressed)
     {
@@ -123,11 +132,13 @@ public class Selection
             if (isShiftPressed)
             {
                 AddObject(meshModel);
+                OnPropertyChanged(nameof(selectionCenter));
             }
             else
             {
                 Clear();
                 AddObject(meshModel);
+                OnPropertyChanged(nameof(selectionCenter));
             }
         }
     }

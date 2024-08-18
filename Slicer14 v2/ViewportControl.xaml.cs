@@ -22,14 +22,7 @@ namespace Slicer14_v2
 
             if (manipulator != null)
             {
-                DependencyPropertyDescriptor dpd = DependencyPropertyDescriptor.FromProperty(TransformManipulator3D.TargetProperty, typeof(TransformManipulator3D));
-                if (dpd != null)
-                {
-                    dpd.AddValueChanged(manipulator, ManipulatorTargetChanged);
-                }
-
                 manipulator.Mouse3DMove += MoveChanged;
-
             }
         }
 
@@ -40,14 +33,6 @@ namespace Slicer14_v2
                 vm.CurrentSelection.ApplyTransformToSelectedGroup();
             }
             
-        }
-
-        private void ManipulatorTargetChanged(object sender, EventArgs e)
-        {
-            if (manipulator.Target is GroupModel3D group)
-            {
-                UpdateBoundingBox();
-            }
         }
         
         private LineGeometryModel3D boundingBoxLines;
@@ -63,7 +48,6 @@ namespace Slicer14_v2
             {
                 // Apply the model's transform to the bounding box
                 BoundingBox boundingBox = viewModel.CurrentSelection.CustomBounds;
-                boundingBox = boundingBox.Transform(viewModel.CurrentSelection.selectionCenter.Transform.ToMatrix());
 
                 // Generate the bounding box lines using LineBuilder
                 var lineGeometry = LineBuilder.GenerateBoundingBox(boundingBox);
@@ -104,9 +88,21 @@ namespace Slicer14_v2
             {
                 UpdateBoundingBox();
             }
+            if (e.PropertyName == nameof(MainViewModel.CurrentSelection.selectionCenter))
+            {
+
+                if (DataContext is MainViewModel vm)
+                {
+                    var center = vm.CurrentSelection.CustomBounds.Center;
+            
+                    // Reset the manipulator transform before applying the new position
+                    manipulator.Target = null;
+                    Console.WriteLine($" manipulator.Target { manipulator.Target}");
+                    manipulator.Target = vm.CurrentSelection.selectionCenter;
+                    
+                }
+            }
         }
-        
-        // Pass MouseDown event to ViewModel
         private void Viewport_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (DataContext is MainViewModel vm)
@@ -114,8 +110,6 @@ namespace Slicer14_v2
                 vm.OnMouseDown(sender, e);
             }
         }
-        
-        
         private void Viewport_Keydown(object sender, KeyEventArgs e)
         {
             if (DataContext is MainViewModel vm)
